@@ -53,7 +53,7 @@ if st.session_state.page=="login":
                     st.session_state.username = username
                     st.session_state.page="home"
                     st.rerun()
-                elif user=="locked":
+                elif user=="Locked":
                     st.error("Account locked , Try again after sometime")
                 else:
                     st.error("Invalid credentials.")
