@@ -45,8 +45,8 @@ if st.session_state.page=="login":
         if st.button("Login",use_container_width=True):
             if not username or not password:
                 st.error("Username / password cannot be empty")
-            user=login_page(username,password)
             else:
+                user=login_page(username,password)
                 if user:
                     st.success("Login successful.")
                     st.session_state.authenticated=True #Fixed buy
