@@ -47,12 +47,14 @@ if st.session_state.page=="login":
                 st.error("Username / password cannot be empty")
             else:
                 user=login_page(username,password)
-                if user:
+                if user==True:
                     st.success("Login successful.")
                     st.session_state.authenticated=True #Fixed buy
                     st.session_state.username = username
                     st.session_state.page="home"
                     st.rerun()
+                elif user=="locked":
+                    st.error("Account locked , Try again after sometime")
                 else:
                     st.error("Invalid credentials.")
         st.divider()
