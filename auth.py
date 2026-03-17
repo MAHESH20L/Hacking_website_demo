@@ -28,11 +28,12 @@ def login_page(username,password):
                     return "Locked"
                 else:
                     attempts=0
-           if dec_hash(password,user[0]):
-               cursor.execute("UPDATE users SET failed_attempts=0,last_attempt=0 WHERE username=?",(username,))
-               conn.commit()
-               conn.close()
-               return True
+            
+            if dec_hash(password,user[0]):
+                cursor.execute("UPDATE users SET failed_attempts=0,last_attempt=0 WHERE username=?",(username,))
+                conn.commit()
+                conn.close()
+                return True
             attempts+=1
             cursor.execute("UPDATE users SET failed_attempts=?,last_attempt=? WHERE username=?",(attempts,time.time(),username))
             conn.commit()
