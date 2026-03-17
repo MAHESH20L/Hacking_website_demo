@@ -6,11 +6,12 @@ create_table()
 from Dashboard import home
 if "authenticated" not in st.session_state:
     st.session_state.authenticated=False
+if "page" not in st.session_state:
+    st.session_state.page="login"
 if st.session_state.page=="home" and not st.session_state.get("authenticated"):
     st.session_state.page="login" #bug fixed
 st.set_page_config(page_title="Auth App",layout="wide")
-if "page" not in st.session_state:
-    st.session_state.page="login"
+
 def signup():
     col1,col2,col3=st.columns([1,1,1])
     with col2:
