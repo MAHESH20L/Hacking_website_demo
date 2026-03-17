@@ -1,8 +1,11 @@
+#This repo is done for my learning of development as well as ethical hacking.
 import streamlit as st
 from auth import login_page,signup_page
 from database import create_table
 create_table()
 from Dashboard import home
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated=False
 st.set_page_config(page_title="Auth App",layout="wide")
 if "page" not in st.session_state:
     st.session_state.page="login"
@@ -35,6 +38,7 @@ if st.session_state.page=="login":
             user=login_page(username,password)
             if user:
                 st.success("Login successful.")
+                st.session_state.authenticated=True #Fixed buy
                 st.session_state.page="home"
                 st.rerun()
             else:
