@@ -36,6 +36,8 @@ if st.session_state.page=="login":
         password=st.text_input("password",type="password")
         if st.button("Login",use_container_width=True):
             user=login_page(username,password)
+            if st.session_state=="home" and not st.session_state.get("authenticated"):
+                st.session_state.page="login"
             if user:
                 st.success("Login successful.")
                 st.session_state.authenticated=True #Fixed buy
