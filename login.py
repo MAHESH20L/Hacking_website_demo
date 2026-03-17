@@ -43,15 +43,18 @@ if st.session_state.page=="login":
         username=st.text_input("username")
         password=st.text_input("password",type="password")
         if st.button("Login",use_container_width=True):
+            if not username or not password:
+                st.error("Username / password cannot be empty")
             user=login_page(username,password)
-            if user:
-                st.success("Login successful.")
-                st.session_state.authenticated=True #Fixed buy
-                st.session_state.username = username
-                st.session_state.page="home"
-                st.rerun()
             else:
-                st.error("Invalid credentials.")
+                if user:
+                    st.success("Login successful.")
+                    st.session_state.authenticated=True #Fixed buy
+                    st.session_state.username = username
+                    st.session_state.page="home"
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials.")
         st.divider()
         if st.button("create_account",use_container_width=True):
             st.session_state.page="signup"
