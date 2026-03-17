@@ -18,7 +18,6 @@ def login_page(username,password):
         cursor=conn.cursor()#connecting database
         cursor.execute("Select password,failed_attempts,last_attempt from users where username=?",(username,))
         user=cursor.fetchone()
-        conn.close()
         if user:
             attempts=user[1]
             last_time=user[2]
