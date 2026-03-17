@@ -6,6 +6,8 @@ create_table()
 from Dashboard import home
 if "authenticated" not in st.session_state:
     st.session_state.authenticated=False
+if st.session_state.page=="home" and not st.session_state.get("authenticated"):
+    st.session_state.page="login" #bug fixed
 st.set_page_config(page_title="Auth App",layout="wide")
 if "page" not in st.session_state:
     st.session_state.page="login"
@@ -36,8 +38,6 @@ if st.session_state.page=="login":
         password=st.text_input("password",type="password")
         if st.button("Login",use_container_width=True):
             user=login_page(username,password)
-            if st.session_state.page=="home" and not st.session_state.get("authenticated"):
-                st.session_state.page="login" #bug fixed
             if user:
                 st.success("Login successful.")
                 st.session_state.authenticated=True #Fixed buy
