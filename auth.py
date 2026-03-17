@@ -26,7 +26,7 @@ def signup_page(username,password):
     user=cursor.fetchone()
     if user:
         conn.close()
-        st.error("User already exists")
+        st.error("Cannot signup as username does not follow our naming policy.")
         return False
     hashed=hash_pass(password)
     cursor.execute("INSERT into users(username,password) VALUES(?,?)",(username,hashed))
