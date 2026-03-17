@@ -8,14 +8,17 @@ def hash_pass(password):
 def dec_hash(password,hashed):
     return bcrypt.checkpw(password.encode(),hashed.encode())
 def login_page(username,password):
-    conn=connect_db()
-    cursor=conn.cursor()#connecting database
-    cursor.execute("Select password from users where username=?",(username,))
-    user=cursor.fetchone()
-    conn.close()
-    if user:
-       return dec_hash(password,user[0])
-    return False
+    if not username or not password:
+        return False
+    else:
+        conn=connect_db()
+        cursor=conn.cursor()#connecting database
+        cursor.execute("Select password from users where username=?",(username,))
+        user=cursor.fetchone()
+        conn.close()
+        if user:
+           return dec_hash(password,user[0])
+        return False
 def signup_page(username,password):
     conn=connect_db()
     cursor=conn.cursor()
