@@ -31,7 +31,7 @@ def signup():
                 st.session_state.page='login'
                 st.rerun()
             else:
-                st.error("User already exists")
+                st.error("Cannot signup username does not follow our rules.")
         st.divider()
         if st.button("Back_to_login",use_container_width=True):
             st.session_state.page="login"
