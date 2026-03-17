@@ -31,7 +31,7 @@ def signup():
                 st.session_state.page='login'
                 st.rerun()
             else:
-                st.error("Cannot signup as username does not follow our naming policy")
+                st.error("Signup failed.")
         st.divider()
         if st.button("Back_to_login",use_container_width=True):
             st.session_state.page="login"
