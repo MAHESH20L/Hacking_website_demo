@@ -193,13 +193,13 @@ if st.session_state.page=="login":
                     st.rerun()
                 elif user=="Locked":
                     st.error("Account locked , Try again after sometime")
-                     EMAIL = st.secrets["EMAIL"]
-                     PASSWORD = st.secrets["EMAIL_PASS"]
-                     server = smtplib.SMTP("smtp.gmail.com", 587)
-                     server.starttls()
-                     server.login(EMAIL, PASSWORD)
-                     server.sendmail(EMAIL, email, f"Your account got locked, if not done by you change the password after sometime.")
-                     server.quit()
+                    EMAIL = st.secrets["EMAIL"]
+                    PASSWORD = st.secrets["EMAIL_PASS"]
+                    server = smtplib.SMTP("smtp.gmail.com", 587)
+                    server.starttls()
+                    server.login(EMAIL, PASSWORD)
+                    server.sendmail(EMAIL, email, f"Your account got locked, if not done by you change the password after sometime.")
+                    server.quit()
                 else:
                     st.error("Invalid credentials.")
         st.divider()
