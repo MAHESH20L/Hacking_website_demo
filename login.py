@@ -198,9 +198,9 @@ if st.session_state.page=="login":
                     server = smtplib.SMTP("smtp.gmail.com", 587)
                     server.starttls()
                     server.login(EMAIL, PASSWORD)
-                    if email:
+                    if username:
                         message = "Subject: Account Locked Alert\n\nYour account got locked. If this was not you, please change your password."
-                        server.sendmail(EMAIL, email, message)
+                        server.sendmail(EMAIL, username, message)
                     server.quit()
                 else:
                     st.error("Invalid credentials.")
