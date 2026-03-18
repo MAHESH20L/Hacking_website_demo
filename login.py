@@ -174,7 +174,6 @@ if st.session_state.page=="login":
                 st.error("Username / password cannot be empty")
             elif not is_valid_email(username):
                 st.error("Enter valid email")
-                return
             else:
                 user=login_page(username,password)
                 if user==True:
