@@ -60,109 +60,119 @@ def send_otp(email, otp_type="login"):
     server.sendmail(EMAIL, email, f"Your OTP is {otp}")
     server.quit()
 def otp_page():
-    st.subheader("🔐 Enter OTP")
-    if "login_otp" not in st.session_state:
-        send_otp(st.session_state.temp_user, "login")
-    otp_input = st.text_input("Enter OTP")
-    if st.button("Verify"):
-        # empty check
-        if not otp_input:
-            st.error("Enter OTP")
-            return
-        # expiry
-        if time.time() - st.session_state.login_otp_time > 120:
-            st.error("OTP expired")
-            st.session_state.login_otp = None
-            st.session_state.otp_attempts = 0
+    col1,col2,col3=st.columns([1,1,1])
+    with col2:
+        st.subheader("🔐 Enter OTP")
+        if "login_otp" not in st.session_state:
+            send_otp(st.session_state.temp_user, "login")
+        otp_input = st.text_input("Enter OTP")
+        if st.button("Verify"):
+            # empty check
+            if not otp_input:
+                st.error("Enter OTP")
+                return
+            # expiry
+            if time.time() - st.session_state.login_otp_time > 120:
+                st.error("OTP expired")
+                st.session_state.login_otp = None
+                st.session_state.otp_attempts = 0
+                st.session_state.page = "login"
+                st.rerun()
+            # attempts
+            if "otp_attempts" not in st.session_state:
+                st.session_state.otp_attempts = 0
+            st.session_state.otp_attempts += 1
+            if st.session_state.otp_attempts > 5:
+                st.error("Too many attempts")
+                st.stop()
+            # verify
+            if otp_input == st.session_state.login_otp:
+                st.success("Login successful")
+                st.session_state.authenticated = True
+                st.session_state.username = st.session_state.temp_user
+                st.session_state.page = "home"
+                # cleanup
+                st.session_state.otp_attempts = 0
+                st.session_state.login_otp = None
+                st.session_state.temp_user = None
+                st.rerun()
+            else:
+                st.error("Wrong OTP")
+        # resend
+        if "last_otp_time" not in st.session_state:
+            st.session_state.last_otp_time = 0
+        if st.button("Resend OTP"):
+            if time.time() - st.session_state.last_otp_time < 30:
+                st.warning("Wait 30 seconds")
+            else:
+                send_otp(st.session_state.temp_user, "login")
+                st.session_state.last_otp_time = time.time()
+                st.success("OTP sent again")
+def reset_page():
+     col1,col2,col3=st.columns([1,1,1])
+     with col2:
+         st.subheader("🔑 Reset Password")
+         email = st.text_input("Enter your email")
+         if st.button("Send Reset OTP",use_container_width=True):
+             if not email:
+                st.error("Enter email")
+                return
+             elif not is_valid_email(email):
+                st.error("Enter valid email")
+                return
+             else:
+                st.session_state.reset_user = email
+                send_otp(email, "reset")
+                st.session_state.page = "reset_verify"
+                st.rerun()
+def reset_verify_page():
+     col1,col2,col3=st.columns([1,1,1])
+     with col2:
+        st.subheader("🔑 Reset Password")
+        otp = st.text_input("Enter OTP")
+        new_pass = st.text_input("New Password", type="password")
+        if st.button("Update Password",use_container_width=True):
+            # empty check
+            if not otp or not new_pass:
+                st.error("Fill all fields")
+                return
+            # expiry
+            if time.time() - st.session_state.reset_otp_time > 120:
+                st.session_state.reset_otp = None
+                st.error("OTP expired")
+                return
+            # attempts
+            if "reset_attempts" not in st.session_state:
+                st.session_state.reset_attempts = 0
+            st.session_state.reset_attempts += 1
+            if st.session_state.reset_attempts > 5:
+                st.error("Too many attempts")
+                st.stop()
+            # verify
+            if otp != st.session_state.get("reset_otp"):
+                st.error("Wrong OTP")
+                return
+            from auth import hash_pass
+            from database import connect_db
+            conn = connect_db()
+            cursor = conn.cursor()
+            hashed = hash_pass(new_pass)
+            cursor.execute(
+                "UPDATE users SET password=? WHERE username=?",
+                (hashed, st.session_state.reset_user)
+            )
+            conn.commit()
+            conn.close()
+            st.success("Password updated successfully")
+            # cleanup
+            st.session_state.reset_attempts = 0
+            st.session_state.reset_otp = None
             st.session_state.page = "login"
             st.rerun()
-        # attempts
-        if "otp_attempts" not in st.session_state:
-            st.session_state.otp_attempts = 0
-        st.session_state.otp_attempts += 1
-        if st.session_state.otp_attempts > 5:
-            st.error("Too many attempts")
-            st.stop()
-        # verify
-        if otp_input == st.session_state.login_otp:
-            st.success("Login successful")
-            st.session_state.authenticated = True
-            st.session_state.username = st.session_state.temp_user
-            st.session_state.page = "home"
-            # cleanup
-            st.session_state.otp_attempts = 0
-            st.session_state.login_otp = None
-            st.session_state.temp_user = None
+        st.divider():
+        if st.button("back_to_login",use_container_width=True):
+            st.session_state.page="login"
             st.rerun()
-        else:
-            st.error("Wrong OTP")
-    # resend
-    if "last_otp_time" not in st.session_state:
-        st.session_state.last_otp_time = 0
-    if st.button("Resend OTP"):
-        if time.time() - st.session_state.last_otp_time < 30:
-            st.warning("Wait 30 seconds")
-        else:
-            send_otp(st.session_state.temp_user, "login")
-            st.session_state.last_otp_time = time.time()
-            st.success("OTP sent again")
-def reset_page():
-     st.subheader("🔑 Reset Password")
-     email = st.text_input("Enter your email")
-     if st.button("Send Reset OTP"):
-         if not email:
-            st.error("Enter email")
-            return
-         elif not is_valid_email(email):
-            st.error("Enter valid email")
-            return
-         else:
-            st.session_state.reset_user = email
-            send_otp(email, "reset")
-            st.session_state.page = "reset_verify"
-            st.rerun()
-def reset_verify_page():
-    st.subheader("🔑 Reset Password")
-    otp = st.text_input("Enter OTP")
-    new_pass = st.text_input("New Password", type="password")
-    if st.button("Update Password"):
-        # empty check
-        if not otp or not new_pass:
-            st.error("Fill all fields")
-            return
-        # expiry
-        if time.time() - st.session_state.reset_otp_time > 120:
-            st.session_state.reset_otp = None
-            st.error("OTP expired")
-            return
-        # attempts
-        if "reset_attempts" not in st.session_state:
-            st.session_state.reset_attempts = 0
-        st.session_state.reset_attempts += 1
-        if st.session_state.reset_attempts > 5:
-            st.error("Too many attempts")
-            st.stop()
-        # verify
-        if otp != st.session_state.get("reset_otp"):
-            st.error("Wrong OTP")
-            return
-        from auth import hash_pass
-        from database import connect_db
-        conn = connect_db()
-        cursor = conn.cursor()
-        hashed = hash_pass(new_pass)
-        cursor.execute(
-            "UPDATE users SET password=? WHERE username=?",
-            (hashed, st.session_state.reset_user)
-        )
-        conn.commit()
-        conn.close()
-        st.success("Password updated successfully")
-        # cleanup
-        st.session_state.reset_attempts = 0
-        st.session_state.reset_otp = None
-        st.session_state.page = "login"
-        st.rerun()
 if st.session_state.page=="login":
     col1,col2,col3=st.columns([1,1,1])
     with col2:
