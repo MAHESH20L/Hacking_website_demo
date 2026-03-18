@@ -57,7 +57,7 @@ def send_otp(email, otp_type="login"):
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
     server.login(EMAIL, PASSWORD)
-    server.sendmail(EMAIL, email, f"Your OTP is {otp}")
+    server.sendmail(EMAIL, email, f"Subject OTP for login : \n\n Your OTP is {otp}")
     server.quit()
 def otp_page():
     col1,col2,col3=st.columns([1,1,1])
