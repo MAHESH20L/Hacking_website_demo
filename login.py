@@ -169,7 +169,7 @@ def reset_verify_page():
             st.session_state.reset_otp = None
             st.session_state.page = "login"
             st.rerun()
-        st.divider():
+        st.divider()
         if st.button("back_to_login",use_container_width=True):
             st.session_state.page="login"
             st.rerun()
